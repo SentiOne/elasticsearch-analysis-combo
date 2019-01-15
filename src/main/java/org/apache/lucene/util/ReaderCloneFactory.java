@@ -18,7 +18,6 @@
 package org.apache.lucene.util;
 
 import org.apache.logging.log4j.Logger;
-import org.elasticsearch.common.logging.ESLoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
@@ -45,9 +44,6 @@ import java.util.WeakHashMap;
  * to the underlying String in order to avoid copies. A generic BufferedReader
  */
 public class ReaderCloneFactory {
-
-    private static final Logger logger = ESLoggerFactory.getLogger(ReaderCloneFactory.class.getSimpleName());
-
     /**
      * Interface for a utility class, able to unwrap a {@link java.io.Reader}
      * inside another {@link Reader}.
@@ -208,7 +204,6 @@ public class ReaderCloneFactory {
                     try {
                         cloner.init(forReader);
                     } catch (Exception e) {
-                        logger.debug("Error while initializing [{}]", e, cloner.getClass().getCanonicalName());
                         cloner = null;
                     }
                 }
@@ -226,7 +221,6 @@ public class ReaderCloneFactory {
                             return (ReaderCloner<T>)ReaderCloneFactory.getCloner(Reader.class, (Class<Reader>)unwrapped.getClass(), unwrapped);
                     } catch (Throwable ignore) {
                         // in case of errors, simply continue the began process and forget about this failed attempt
-                        logger.debug("Error while cloning [{}] with [{}]", ignore, unwrapper.getClass().getCanonicalName(), cloner.getClass().getCanonicalName());
                     }
             }
             // Continue resolution with super class...
@@ -237,10 +231,6 @@ public class ReaderCloneFactory {
             else
                 forClass = null;
         }
-        if (forReader != null)
-            logger.debug("Could not find a suitable ReaderCloner for [{}]", forReader.getClass().getCanonicalName());
-        else
-            logger.debug("Could not find a suitable ReaderCloner for class [{}]", originalForClass.getCanonicalName());
         return null;
     }
 

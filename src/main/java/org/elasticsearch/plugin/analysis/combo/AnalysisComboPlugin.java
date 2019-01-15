@@ -20,7 +20,7 @@
 package org.elasticsearch.plugin.analysis.combo;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.ComboAnalyzerWrapper;
+import org.elasticsearch.analysis.common.ComboAnalyzerWrapper;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.env.Environment;
 import org.elasticsearch.index.IndexSettings;

@@ -2,6 +2,7 @@ package org.elasticsearch.index.analysis;
 
 import org.elasticsearch.action.admin.indices.analyze.AnalyzeRequest;
 import org.elasticsearch.action.admin.indices.analyze.AnalyzeResponse;
+import org.elasticsearch.analysis.common.CommonAnalysisPlugin;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.ToXContent;
 import org.elasticsearch.common.xcontent.XContentFactory;
@@ -25,7 +26,7 @@ public class TestIntegration extends ESIntegTestCase {
     public static final String ANALYZER = "configured_analyzer";
 
     protected Collection<Class<? extends Plugin>> nodePlugins() {
-        return Collections.singleton(AnalysisComboPlugin.class);
+        return Arrays.asList(CommonAnalysisPlugin.class, AnalysisComboPlugin.class);
     }
 
     protected Settings nodeSettings(int nodeOrdinal) {
@@ -41,7 +42,7 @@ public class TestIntegration extends ESIntegTestCase {
             try {
                 Map<String,String> params = new HashMap<String,String>();
                 params.put("format", "text");
-                logger.info("Tokens for \""+input+"\": " + response.toXContent(jsonBuilder().startObject(), new ToXContent.MapParams(params)).endObject().string());
+                logger.info("Tokens for \""+input+"\": " + response.toXContent(jsonBuilder().startObject(), new ToXContent.MapParams(params)).endObject().toString());
             } catch (IOException e) {
                 logger.error("Tokens for \""+input+"\": ERROR", e);
             }

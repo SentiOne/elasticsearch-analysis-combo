@@ -17,16 +17,15 @@
  * under the License.
  */
 
-package org.apache.lucene.analysis;
+package org.elasticsearch.analysis.common;
 
-import org.apache.logging.log4j.Logger;
+import org.apache.lucene.analysis.Analyzer;
 import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.common.logging.ESLoggerFactory;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.index.analysis.IndexAnalyzers;
 import org.elasticsearch.index.analysis.NamedAnalyzer;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -36,16 +35,13 @@ public final class ComboAnalyzerWrapper extends Analyzer {
 
     public static final String NAME = "combo";
 
-    private final Logger logger;
-
     private final Settings settings;
     private final String name;
     private final Function<String, NamedAnalyzer> analyzerResolver;
 
-    private org.apache.lucene.analysis.ComboAnalyzer analyzer;
+    private ComboAnalyzer analyzer;
 
     public ComboAnalyzerWrapper(String name, Settings settings, Function<String, NamedAnalyzer> analyzerResolver) {
-        logger = ESLoggerFactory.getLogger(NAME+">"+name);
 
         this.name = name;
 
@@ -64,7 +60,7 @@ public final class ComboAnalyzerWrapper extends Analyzer {
     protected void init() {
         if (analyzer != null) return;
 
-        String[] sub = settings.getAsArray("sub_analyzers");
+        List<String> sub = settings.getAsList("sub_analyzers");
         ArrayList<Analyzer> subAnalyzers = new ArrayList<Analyzer>();
         if (sub == null) {
             throw new IllegalArgumentException("Analyzer ["+name+"] analyzer of type ["+NAME+"], must have a \"sub_analyzers\" list property");
@@ -79,7 +75,7 @@ public final class ComboAnalyzerWrapper extends Analyzer {
             }
         }
 
-        this.analyzer = new org.apache.lucene.analysis.ComboAnalyzer(subAnalyzers.toArray(new Analyzer[subAnalyzers.size()]));
+        this.analyzer = new ComboAnalyzer(subAnalyzers.toArray(new Analyzer[subAnalyzers.size()]));
 
         Boolean tokenstreamCaching = settings.getAsBoolean("tokenstream_caching", null);
         if (tokenstreamCaching != null)

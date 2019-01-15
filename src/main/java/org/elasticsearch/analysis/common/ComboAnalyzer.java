@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.lucene.analysis;
+package org.elasticsearch.analysis.common;
 
-import org.apache.lucene.analysis.miscellaneous.UniqueTokenFilter;
+import org.apache.lucene.analysis.*;
 import org.apache.lucene.util.ReaderCloneFactory;
 
 import java.io.IOException;

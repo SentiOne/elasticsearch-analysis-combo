@@ -19,8 +19,9 @@
 
 package org.elasticsearch.index.analysis;
 
-import org.apache.lucene.analysis.ComboAnalyzerWrapper;
+import org.elasticsearch.analysis.common.ComboAnalyzerWrapper;
 import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.analysis.common.CommonAnalysisPlugin;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.common.settings.IndexScopedSettings;
 import org.elasticsearch.common.settings.Settings;
@@ -58,9 +59,10 @@ public class ComboAnalyzerProvider extends AbstractIndexAnalyzerProvider<ComboAn
         // Here because in get we get a plugin loading loop
         this.pluginsService = new PluginsService(
             environment.settings(),
+            environment.configFile(),
             environment.modulesFile(),
             environment.pluginsFile(),
-            Collections.emptyList() // TODO: from where should I take classpath for plugins?
+            Collections.singletonList(CommonAnalysisPlugin.class)
         );
     }
 
@@ -96,7 +98,6 @@ public class ComboAnalyzerProvider extends AbstractIndexAnalyzerProvider<ComboAn
         final IndexSettings newIndexSettings = new IndexSettings(
             newIndexMetaData,
             newSettings,
-            indexSettings::matchesIndexName,
             newScopedSettings);
 
         return analysisRegistry.build(newIndexSettings);
@@ -112,9 +113,9 @@ public class ComboAnalyzerProvider extends AbstractIndexAnalyzerProvider<ComboAn
             .put(allSettingsButAnalyzers);
 
         filteredGroups.forEach((analyzerName, analyzerSettings) -> {
-            analyzerSettings.getAsMap().forEach((analyzerSettingName, analyzerSettingValue) -> {
+            analyzerSettings.keySet().forEach((analyzerSettingName) -> {
                 String settingKey = ANALYZER_SETTINGS_PREFIX + "." + analyzerName + "." + analyzerSettingName;
-                newSettings.put(settingKey, analyzerSettingValue);
+                newSettings.copy(settingKey, analyzerSettingName, analyzerSettings);
             });
         });
 
