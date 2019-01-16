@@ -21,7 +21,7 @@ package org.elasticsearch.index.analysis;
 
 import org.elasticsearch.analysis.common.ComboAnalyzerWrapper;
 import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.analysis.common.CommonAnalysisPlugin;
+//import org.elasticsearch.analysis.common.CommonAnalysisPlugin;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.common.settings.IndexScopedSettings;
 import org.elasticsearch.common.settings.Settings;
@@ -62,7 +62,7 @@ public class ComboAnalyzerProvider extends AbstractIndexAnalyzerProvider<ComboAn
             environment.configFile(),
             environment.modulesFile(),
             environment.pluginsFile(),
-            Collections.singletonList(CommonAnalysisPlugin.class)
+            Collections.emptyList()
         );
     }
 
