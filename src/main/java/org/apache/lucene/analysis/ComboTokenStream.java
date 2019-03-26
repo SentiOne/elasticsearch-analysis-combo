@@ -135,6 +135,7 @@ public class ComboTokenStream extends TokenStream {
         for (PositionedTokenStream pts : positionedTokenStreams) {
             if (pts == null) continue;
             pts.end();
+            restoreState(pts.captureState());
         }
         readQueueResetted = false;
         readQueue.clear();
