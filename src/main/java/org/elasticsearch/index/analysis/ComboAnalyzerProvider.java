@@ -28,6 +28,7 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.env.Environment;
 import org.elasticsearch.index.IndexSettings;
 import org.elasticsearch.indices.analysis.AnalysisModule;
+import org.elasticsearch.plugin.analysis.combo.PluginsServiceRef;
 import org.elasticsearch.plugins.AnalysisPlugin;
 import org.elasticsearch.plugins.PluginsService;
 
@@ -43,9 +44,9 @@ public class ComboAnalyzerProvider extends AbstractIndexAnalyzerProvider<ComboAn
     private final Environment environment;
     private final Settings analyzerSettings;
     private final String name;
-    private final PluginsService pluginsService;
+    private final PluginsServiceRef pluginsServiceRef;
 
-    public ComboAnalyzerProvider(IndexSettings indexSettings, Environment environment, String name, Settings settings) {
+    public ComboAnalyzerProvider(IndexSettings indexSettings, Environment environment, String name, Settings settings, PluginsServiceRef pluginsServiceRef) {
         super(indexSettings, name, settings);
         // Store parameters for delegated usage inside the ComboAnalyzerWrapper itself
         // Sub-analyzer resolution must use the AnalysisService,
@@ -57,13 +58,8 @@ public class ComboAnalyzerProvider extends AbstractIndexAnalyzerProvider<ComboAn
 
         // TODO: Way to get List<AnalysisPlugin> without loading all plugins by yourself?
         // Here because in get we get a plugin loading loop
-        this.pluginsService = new PluginsService(
-            environment.settings(),
-            environment.configFile(),
-            environment.modulesFile(),
-            environment.pluginsFile(),
-            Collections.emptyList()
-        );
+        this.pluginsServiceRef = pluginsServiceRef;
+        this.pluginsServiceRef.init(environment);
     }
 
     @Override
@@ -82,7 +78,7 @@ public class ComboAnalyzerProvider extends AbstractIndexAnalyzerProvider<ComboAn
     private IndexAnalyzers getIndexAnalyzers(Environment environment) throws IOException {
         final AnalysisModule analysisModule = new AnalysisModule(
             environment,
-            pluginsService.filterPlugins(AnalysisPlugin.class)
+            pluginsServiceRef.getPluginsService().filterPlugins(AnalysisPlugin.class)
         );
 
         final AnalysisRegistry analysisRegistry = analysisModule.getAnalysisRegistry();
